@@ -1,6 +1,8 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 public class Shooter : MonoBehaviour
 {
@@ -18,7 +20,13 @@ public class Shooter : MonoBehaviour
     [HideInInspector] public bool isFiring;
 
     private Coroutine _firingCoroutine;
-    
+    private AudioPlayer _audioPlayer;
+
+    private void Awake()
+    {
+        _audioPlayer = FindObjectOfType<AudioPlayer>();
+    }
+
     // Start is called before the first frame update
     private void Start()
     {
@@ -36,7 +44,6 @@ public class Shooter : MonoBehaviour
 
     private void Fire()
     {
-        Debug.Log("isFiring : " + isFiring);
         if (isFiring && _firingCoroutine == null)
         {
             _firingCoroutine = StartCoroutine(FireContinuously());
@@ -65,6 +72,8 @@ public class Shooter : MonoBehaviour
             var timeToNextProjectile =
                 Random.Range(baseFiringRate - firingRateVariance, baseFiringRate + firingRateVariance);
             timeToNextProjectile = Mathf.Clamp(timeToNextProjectile, minimumFiringRate, float.MaxValue);
+            
+            _audioPlayer.PlayShootingClip();
 
             yield return new WaitForSeconds(timeToNextProjectile);
         }
